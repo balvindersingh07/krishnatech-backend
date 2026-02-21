@@ -20,20 +20,21 @@ async function sendContactEmail({ name, email, phone, message }) {
   const subject = `New Website Message — ${name}`;
 
   const adminHtml = `
-    <div style="font-family: Arial; line-height: 1.6;">
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
       <h2>New Contact Submission</h2>
-      <p><b>Name:</b> ${name}</p>
-      <p><b>Email:</b> ${email}</p>
-      <p><b>Phone:</b> ${phone || "-"}</p>
-      <p><b>Message:</b></p>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone || "-"}</p>
+      <p><strong>Message:</strong></p>
       <p>${message}</p>
     </div>
   `;
 
   // 1️⃣ Send to admin
   await resend.emails.send({
-    from: "KrishnaTech <noreply@krishnatechinnovations.com>",
+    from: "KrishnaTech Innovations <contact@krishnatechinnovations.com>",
     to: env.EMAIL_TO,
+    reply_to: email,
     subject,
     html: adminHtml,
   });
@@ -41,13 +42,37 @@ async function sendContactEmail({ name, email, phone, message }) {
   // 2️⃣ Auto reply (optional)
   if (env.AUTO_REPLY) {
     await resend.emails.send({
-      from: "KrishnaTech <noreply@krishnatechinnovations.com>",
+      from: "KrishnaTech Innovations <contact@krishnatechinnovations.com>",
       to: email,
-      subject: "We received your message",
+      subject: "Thank You for Contacting KrishnaTech Innovations",
       html: `
-        <p>Hi ${name},</p>
-        <p>Thanks for contacting KrishnaTech Innovations.</p>
-        <p>We will get back to you within 24 hours.</p>
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h2 style="color:#4f46e5;">Thank You for Reaching Out 🚀</h2>
+
+          <p>Hi ${name},</p>
+
+          <p>
+            We have successfully received your message. 
+            Our team at <strong>KrishnaTech Innovations</strong> is reviewing your request.
+          </p>
+
+          <p>
+            We typically respond within <strong>24 hours</strong>. 
+            If your matter is urgent, you can reply directly to this email.
+          </p>
+
+          <hr style="margin:20px 0;" />
+
+          <p style="font-size:14px; color:#555;">
+            Empowering Businesses with Scalable Digital Solutions
+            <br />
+            🌐 Web Development | 📱 Mobile Apps | ☁ Cloud & DevOps | 🤖 AI Solutions
+          </p>
+
+          <p style="font-size:12px; color:#888;">
+            This is an automated confirmation email.
+          </p>
+        </div>
       `,
     });
   }
