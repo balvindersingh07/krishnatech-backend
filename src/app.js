@@ -4,7 +4,9 @@ const cors = require("cors");
 const helmet = require("helmet");
 const env = require("./config/env");
 const nodemailer = require("nodemailer");
-const Resend = require("resend");
+
+// ✅ FIXED IMPORT (IMPORTANT)
+const { Resend } = require("resend");
 
 // ✅ correct route imports
 const healthRoutes = require("./routes/health.routes");
@@ -14,7 +16,7 @@ const aiRoutes = require("./routes/ai.routes");
 
 const app = express();
 
-// ✅ IMPORTANT: trust Render proxy (fixes rate-limit + X-Forwarded-For error)
+// ✅ IMPORTANT: trust Render proxy
 app.set("trust proxy", 1);
 
 // --------------------- security ---------------------
@@ -24,7 +26,7 @@ app.use(helmet());
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// --------------------- CORS (PRODUCTION READY) ---------------------
+// --------------------- CORS ---------------------
 const normalizeOrigins = (value) => {
   if (!value) return [];
   if (Array.isArray(value)) {
@@ -41,7 +43,6 @@ const allowedOrigins = normalizeOrigins(env.CORS_ORIGINS);
 app.use(
   cors({
     origin: (origin, cb) => {
-      // Allow server-to-server / curl / Postman
       if (!origin) return cb(null, true);
 
       if (!allowedOrigins.length) {
@@ -60,7 +61,6 @@ app.use(
   })
 );
 
-// Handle preflight
 app.options("*", cors());
 
 // --------------------- base -------------------------
@@ -68,12 +68,6 @@ app.get("/", (_req, res) => {
   res.json({
     ok: true,
     name: "KrishnaTech Innovations API",
-    endpoints: {
-      health: "/health",
-      contact: "POST /api/contact",
-      leads: "POST /api/leads",
-      ai: "POST /api/ai/ask",
-    },
   });
 });
 
@@ -94,12 +88,9 @@ app.use((_req, res) => {
 // --------------------- error handler ----------------
 app.use((err, _req, res, _next) => {
   console.error("❌ API Error:", err);
-
-  const message = err?.message || "Server error";
-
   res.status(500).json({
     success: false,
-    message,
+    message: err?.message || "Server error",
   });
 });
 
@@ -112,9 +103,9 @@ const sendEmail = async (to, subject, htmlContent) => {
   try {
     const response = await resend.emails.send({
       from: process.env.SMTP_USER,
-      to: to || process.env.EMAIL_TO, // Default to contact email
+      to: to || process.env.EMAIL_TO,
       subject: subject || "Subject here",
-      html: htmlContent, // Email content (HTML format)
+      html: htmlContent,
     });
 
     console.log("Email sent:", response);
