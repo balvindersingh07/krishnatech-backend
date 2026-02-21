@@ -18,16 +18,13 @@ const env = {
     .map((x) => x.trim())
     .filter(Boolean),
 
-  // ✅ Email / SMTP (support both naming styles)
-  SMTP_HOST: process.env.SMTP_HOST || process.env.EMAIL_HOST || "",
-  SMTP_PORT: Number(process.env.SMTP_PORT || process.env.EMAIL_PORT || 587),
-  SMTP_USER: process.env.SMTP_USER || process.env.EMAIL_USER || "",
-  SMTP_PASS: process.env.SMTP_PASS || process.env.EMAIL_PASS || "",
-  EMAIL_TO: process.env.EMAIL_TO || process.env.SMTP_USER || "",
+  // ✅ Resend Email Config
+  RESEND_API_KEY: process.env.RESEND_API_KEY || "",
+  EMAIL_TO: process.env.EMAIL_TO || "",
   AUTO_REPLY:
     String(process.env.AUTO_REPLY || "true").toLowerCase() === "true",
 
-  // OpenAI
+  // OpenAI (optional)
   OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
   OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4o-mini",
 };
